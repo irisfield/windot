@@ -8,6 +8,8 @@ if (!(Test-Path -Path $env:GIT_CONFIG_GLOBAL)) {
   New-Item -Path $env:GIT_CONFIG_GLOBAL -ItemType File -Force | Out-Null
   Invoke-Expression "git config --global core.editor nvim"
   Invoke-Expression "git config --global core.autocrlf false"
+  Invoke-Expression "git config --global credential.helper manager"
+  Invoke-Expression "git config --global init.defaultBranch master"
   Write-Host "Git config file location set to $($env:GIT_CONFIG_GLOBAL)." -ForegroundColor Blue
 }
 
