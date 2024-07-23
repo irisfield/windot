@@ -1,0 +1,31 @@
+# interpreter for shell commands
+set shell powershell
+
+# leave some space at the top and the bottom of the screen
+set scrolloff 10
+
+# change the default open command to work in powershell
+# the programs used to open different file types must be in your $env:PATH
+cmd open ${{
+  # The following util is required: https://github.com/nscaife/file-windows
+  $fileutil = "${env:USERPROFILE}\Documents\PowerShell\Bin\file-windows\file.exe"
+  $mimetype = (& $fileutil --mime-type -b $env:fx)
+  switch -Wildcard ($mimetype) {
+    "application/*" { &start $env:fx }
+    "text/*" { nvim $env:fx }
+    "application/json" { nvim $env:fx }
+    "inode/x-empty" { nvim $env:fx }
+    "image/*" { &start $env:fx }
+    "video/*" { &start $env:fx }
+    "image/gif" { &start $env:fx }
+    "video/webm" { &start $env:fx }
+    "application/octet-stream" { &start $env:fx }
+    "audio/*" { &start $env:fx }
+    "application/pdf" { &start $env:fx }
+    "application/epub" { &start $env:fx }
+    default { &start $env:fx }
+  }
+}}
+
+map gg top
+map D delete

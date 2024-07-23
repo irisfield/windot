@@ -1,0 +1,57 @@
+#!/bin/sh
+
+###
+# Arch Wiki:
+# NetworkManager has the ability to start services when you connect to a
+# network and stop them when you disconnect. To activate the feature you
+# need to enable and start the `NetworkManager-dispatcher.service`.
+#
+# Once the service is active, scripts can be added to the
+# `/etc/NetworkManager/dispatcher.d` directory.
+#
+# Scripts must be owned by root, otherwise the dispatcher will not execute them.
+# For added security, set group ownership to root as well:
+# $ chown root:root /etc/NetworkManager/dispatcher.d/09-timezone.sh
+#
+# Make sure the file is executable.
+#
+# Reference:
+# https://wiki.archlinux.org/title/NetworkManager
+# https://wiki.archlinux.org/title/System_time#Setting_based_on_geolocation
+###
+
+REFLECTOR_CONF=$(cat <<EOF
+# Reflector configuration file for the systemd service.
+# Last updated: $(date +"%Y-%m-%d %H:%M:%S %Z")
+
+--save /etc/pacman.d/mirrorlist
+--country ${COUNTRY}
+--protocol https
+--latest 20
+--fastest 5
+--sort rate
+--download-timeout 2
+EOF
+)
+
+# Automatically set the system's timezone based on your IP address location
+# and update reflector's configuration every time NetworkManager connects
+# to a network.
+
+STATUS="$2"
+case "$STATUS" in
+    connectivity-change)
+        local COUNTRY="$(curl --fail https://ipapi.co/country)"
+        local TIMEZONE="$(curl --fail https://ipapi.co/timezone)"
+        local LOCAL_TIMEZONE="$(timedatectl | awk '/Time zone:/ {print $3}')"
+
+        if [ "${LOCAL_TIMEZONE}" != "${TIMEZONE}" ]; then
+            timedatectl set-timezone "${TIMEZONE}"
+
+            sed -i "s/--country [^ ]*/--country ${COUNTRY}/" \
+              /etc/xdg/reflector/reflector.conf
+            # reflector --save /etc/pacman.d/mirrorlist -c ${COUNTRY} -p https -l 20 -f 5 --sort rate --download-timeout 2
+            systemctl restart reflector.service
+        fi
+    ;;
+esac
