@@ -460,11 +460,11 @@ Invoke-ApplyRecommendedTweaks
 Start-Sleep -Seconds 1
 
 $WinGetPackageIds = @(
-    "Git.Git"
+    "Git.MinGit"
     "7zip.7zip"
     "gokcehan.lf"
     "Neovim.Neovim"
-    "ShareX.ShareX"
+    # "ShareX.ShareX"
     "IDRIX.VeraCrypt"
     "Mozilla.Firefox"
     "Alacritty.Alacritty"
