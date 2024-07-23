@@ -42,3 +42,6 @@ augroup RestoreCursorShapeOnExit
     autocmd VimLeave * set guicursor=a:ver20-blinkwait175-blinkoff150-blinkon175
 augroup END
 ]])
+
+-- Enable gitconfig syntax highlighting for file named config
+vim.cmd("autocmd BufNewFile,BufRead *config set filetype=gitconfig")
