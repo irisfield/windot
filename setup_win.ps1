@@ -66,7 +66,7 @@ function Create-Symlink {
     try {
       # Attempt to create the symbolic link
       New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force | Out-Null
-      Write-Host "Created SymbolicLink: $($Path) -> $($Target)" -ForegroundColor Green
+      Write-Host "Created SymbolicLink: $($Path) -> $($Target)" -ForegroundColor Blue
     }
     catch {
       Write-Host "Failed to create SymbolicLink: $($Path) -> $($Target)" -ForegroundColor Red
@@ -81,6 +81,8 @@ Create-Symlink -Path "${env:LOCALAPPDATA}\mpv" -Target "${PSScriptRoot}\mpv"
 Create-Symlink -Path "${env:APPDATA}\alacritty" -Target "${PSScriptRoot}\alacritty"
 Create-Symlink -Path "${env:HOMEPATH}\Documents\PowerToys" -Target "${PSScriptRoot}\PowerToys"
 Create-Symlink -Path "${env:HOMEPATH}\Documents\WindowsPowerShell" -Target "${PSScriptRoot}\WindowsPowerShell"
+$FirefoxProfile = $(Get-ChildItem "${env:APPDATA}\Mozilla\Firefox\Profiles" | Where-Object { $_.Name -match 'default$' }).FullName
+Create-Symlink -Path "${FirefoxProfile}\user.js" -Target "${PSScriptRoot}\firefox\user.js"
 Write-Host "Symbolic Links Configured!`n" -ForegroundColor Yellow
 
 $Message = "Would you like run the rest of the script and apply settings and preferences?"
