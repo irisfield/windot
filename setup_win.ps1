@@ -7,6 +7,7 @@ If (([Security.Principal.WindowsIdentity]::GetCurrent()).Owner.Value -ne "S-1-5-
 
 function Ensure-DriveLetter {
     param(
+        [Parameter(Mandatory=$True)]
         [string]$Path
     )
 
@@ -22,7 +23,9 @@ function Ensure-DriveLetter {
 
 function Create-Symlink {
     param(
+        [Parameter(Mandatory=$True)]
         [string]$Path, # Path to where you like to create the symbolic link (omit the drive letter)
+        [Parameter(Mandatory=$True)]
         [string]$Target # The target the symbolic link points to (omit the drive letter)
     )
     $Path = Ensure-DriveLetter -Path $Path
@@ -33,6 +36,7 @@ function Create-Symlink {
         Write-Host -NoNewline "Failed to create SymbolicLink for " -ForegroundColor Red
         Write-Host "$($Target)." -ForegroundColor Blue
         Write-Host "Reason: The file or directory does not exist." -ForegroundColor Red
+        Start-Sleep -Seconds 1
       return
     }
 
@@ -67,6 +71,7 @@ function Create-Symlink {
       # Attempt to create the symbolic link
       New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force | Out-Null
       Write-Host "Created SymbolicLink: $($Path) -> $($Target)" -ForegroundColor Blue
+      Start-Sleep -Seconds 1
     }
     catch {
       Write-Host "Failed to create SymbolicLink: $($Path) -> $($Target)" -ForegroundColor Red
@@ -74,10 +79,44 @@ function Create-Symlink {
     }
 }
 
-Write-Host "Configuring Symbolic Links..." -ForegroundColor Yellow
+# My LF configuration depends on file-windows
+function Install-FileWindows {
+    param(
+        [Parameter(Mandatory=$True)]
+        [string]$RepoName,
+        [Parameter(Mandatory=$True)]
+        [string]$ExtractPath
+    )
+    $DownloadPath = "${env:TEMP}\${RepoName}.zip"
+    $DownloadApiUrl = "https://api.github.com/repos/nscaife/${RepoName}/releases/latest"
+
+    Write-Host "Downloading ${RepoName} to ${env:TEMP}..."
+    (Invoke-RestMethod $DownloadApiUrl).assets | Select-Object -First 1 |
+    ForEach-Object { Invoke-WebRequest $_.browser_download_url -OutFile "$DownloadPath" }
+    Start-Sleep -Seconds 1
+
+    Write-Host "Extracting ${RepoName}.zip to ${ExtractPath}..."
+    Expand-Archive -Path "$DownloadPath" -DestinationPath "$ExtractPath" -Force
+    Start-Sleep -Seconds 1
+
+    Write-Host "Cleaning up ${DownloadPath}..."
+    Remove-Item -Path "$DownloadPath" -Force
+    Start-Sleep -Seconds 1
+}
+
+# Dependency Check
+$FileRepoName = "file-windows"
+$FileExtractPath = "${env:HOMEPATH}\Documents\PowerShell\Bin\${FileRepoName}"
+if (!(Test-Path -Path "${FileExtractPath}\file.exe")) {
+  Write-Host "`nInstallating dependency file-windows..." -ForegroundColor Yellow
+  Install-FileWindows -RepoName $FileRepoName -ExtractPath $FileExtractPath
+}
+
+# Symbolic Links
+Write-Host "`nConfiguring Symbolic Links..." -ForegroundColor Yellow
 Create-Symlink -Path "${env:LOCALAPPDATA}\lf" -Target "${PSScriptRoot}\lf"
 Create-Symlink -Path "${env:LOCALAPPDATA}\nvim" -Target "${PSScriptRoot}\nvim"
-Create-Symlink -Path "${env:LOCALAPPDATA}\mpv" -Target "${PSScriptRoot}\mpv"
+# Create-Symlink -Path "${env:LOCALAPPDATA}\mpv" -Target "${PSScriptRoot}\mpv"
 Create-Symlink -Path "${env:APPDATA}\alacritty" -Target "${PSScriptRoot}\alacritty"
 Create-Symlink -Path "${env:HOMEPATH}\Documents\PowerToys" -Target "${PSScriptRoot}\PowerToys"
 Create-Symlink -Path "${env:HOMEPATH}\Documents\WindowsPowerShell" -Target "${PSScriptRoot}\WindowsPowerShell"
@@ -89,56 +128,8 @@ $Message = "Would you like run the rest of the script and apply settings and pre
 $Choices = "&Yes", "&No"
 $Selection = $Host.UI.PromptForChoice("", $Message, $Choices, -1)
 Switch ($Selection) {
-  0 { break } # Continue running the rest of the script
+  0 { Write-Host ""; break } # Continue running the rest of the script
   1 { exit 1 } # Exit the script
-}
-
-### DEPENDENCIES ###
-
-function Install-LatestGithubRelease {
-    param(
-        [string]$RepoName,
-        [string]$DownloadApiUrl,
-        [string]$ExtractPath
-    )
-    $DownloadPath = "${env:TEMP}\${RepoName}.zip"
-
-    Write-Host "Downloading ${RepoName} to ${env:TEMP}..."
-    Invoke-RestMethod "$DownloadApiUrl" | ForEach-Object {
-        $_.assets | Where-Object { $_.name -like "*win.zip" } | ForEach-Object {
-            Invoke-WebRequest $_.browser_download_url -OutFile "$DownloadPath"
-        }
-    }
-
-    # Create the extraction directory if it does not exist
-    if (!(Test-Path -Path "$ExtractPath")) {
-        New-Item -ItemType Directory -Path "$ExtractPath" | Out-Null
-    }
-
-    Write-Host "Extracting ${RepoName}.zip to ${ExtractPath}..."
-    Expand-Archive -Path "$DownloadPath" -DestinationPath "$ExtractPath" -Force
-
-    Write-Host "Cleaning up ${DownloadPath}..."
-    Remove-Item -Path "$DownloadPath" -Force
-}
-
-# My LF configuration depends on file-windows
-$FileRepoName = "file-windows"
-$FileDownloadApiUrl = "https://api.github.com/repos/nscaife/${FileRepoName}/releases/latest"
-$FileExtractPath = "${env:HOMEPATH}\Documents\PowerShell\Bin\${FileRepoName}"
-
-if (!(Test-Path -Path $FileExtractPath)) {
-  Write-Host "Installating dependency ${FileRepoName}:"
-  Start-Sleep -Seconds 1
-  Install-LatestGithubRelease -RepoName "$FileRepoName" -DownloadApiUrl "$FileDownloadApiUrl" -ExtractPath "$FileExtractPath"
-}
-
-$WinUtilDownloadPath = "${env:HOMEPATH}\Downloads\winutil.ps1"
-$WinUtilDownloadUrl = "https://github.com/ChrisTitusTech/winutil/releases/latest/download/winutil.ps1"
-if (!(Test-Path -Path $WinUtilDownloadPath)) {
-  Write-Host "Downloading the latest version of winutil to ${WinUtilDownloadPath}..."
-  Start-Sleep -Seconds 1
-  Invoke-WebRequest "$WinUtilDownloadUrl" -OutFile "$WinUtilDownloadPath"
 }
 
 ### SETTINGS ###
@@ -477,6 +468,15 @@ Write-Host "--- PACKAGES ---" -ForegroundColor Blue
 foreach ($PackageId in $WinGetPackageIds) {
   Write-Host "Installing ${PackageId}..." -ForegroundColor Yellow
   winget install --id $PackageId
+}
+
+
+$WinUtilDownloadPath = "${env:HOMEPATH}\Downloads\winutil.ps1"
+$WinUtilDownloadUrl = "https://github.com/ChrisTitusTech/winutil/releases/latest/download/winutil.ps1"
+if (!(Test-Path -Path $WinUtilDownloadPath)) {
+  Write-Host "Downloading the latest version of winutil to ${WinUtilDownloadPath}..."
+  Invoke-WebRequest "$WinUtilDownloadUrl" -OutFile "$WinUtilDownloadPath"
+  Start-Sleep -Seconds 1
 }
 
 Write-Host "Script configurations applied. Restart for changes to take effect." -ForegroundColor Yellow
