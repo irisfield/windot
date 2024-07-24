@@ -43,5 +43,5 @@ augroup RestoreCursorShapeOnExit
 augroup END
 ]])
 
--- Enable gitconfig syntax highlighting for file named config
+-- Enable gitconfig syntax highlighting for files ending in "config"
 vim.cmd("autocmd BufNewFile,BufRead *config set filetype=gitconfig")
