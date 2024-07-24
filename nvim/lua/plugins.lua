@@ -62,39 +62,31 @@ require("lazy").setup({
 -- install without yarn or npm
   {
       "iamcco/markdown-preview.nvim",
-      cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+      cmd = {  "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
       ft = { "markdown" },
       build = function()
         local download_url = "https://api.github.com/repos/iamcco/markdown-preview.nvim/releases"
         local extract_path = vim.fn.stdpath("data") .. "\\lazy\\markdown-preview.nvim\\app\\bin"
         local ps_script = [[
           # Download zip file to download path
-          Invoke-RestMethod "%s" | ForEach-Object {
-              $_.assets | Where-Object { $_.name -like "*win.zip" } | ForEach-Object {
-                  Invoke-WebRequest $_.browser_download_url -OutFile "${env:TEMP}\md-preview-win.zip"
-              }
-          }
-
-          # Create the extraction directory if it does not exist
-          if (!(Test-Path -Path "%s")) {
-              New-Item -ItemType Directory -Path "%s" | Out-Null
-          } else {
+          (Invoke-RestMethod "%s").assets | Where-Object { $_.name -like "*win.zip" } |
+          Select-Object -First 1 | ForEach-Object {
+            Invoke-WebRequest -Uri $_.browser_download_url -OutFile "${env:TEMP}\mdp-win.zip"
           }
 
           # Extract zip file to extract path
-          Expand-Archive -Path "${env:TEMP}\md-preview-win.zip" -DestinationPath "%s" -Force
+          Expand-Archive -Path "${env:TEMP}\mdp-win.zip" -DestinationPath "%s" -Force
 
           # Clean up
-          Remove-Item -Path "${env:TEMP}\md-preview-win.zip" -Force
+          Remove-Item -Path "${env:TEMP}\mdp-win.zip" -Force
         ]]
-        local ps_script = string.format(ps_script, download_url, extract_path, extract_path, extract_path)
+        local ps_script = string.format(ps_script, download_url, extract_path)
 
         print "Installing the required binary markdown-preview-win.exe..."
         local pipe = io.popen("powershell -command -", "w")
         pipe:write(ps_script)
         pipe:close()
         print "markdown-preview-win.exe was installed successfully!"
-        vim.api.nvim_command("messages")
       end,
   },
 
