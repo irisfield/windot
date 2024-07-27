@@ -3,8 +3,8 @@
 These notes document installing Arch Linux with the following features:
 - UEFI System
 - Secure Boot
-- Dual Boot with Windows
-- Full-Disk Encryption using BTRFS on LUKS
+- Dual Boot with Windows (Encrypted)
+- Full-Disk Encryption using BTRFS on LUKS1 (until 
 - Encrypted Boot Partition with GRUB 2
 - Automatic Disk Decryption via TPM2 Unlocking
 - [Unified Kernel Images (UKI)](https://wiki.archlinux.org/title/Unified_kernel_image)
@@ -26,52 +26,57 @@ An UEFI system with Windows installed before Linux and a TPM 2.0 module onboard.
 Whether you are installing Windows from scratch or already have a Windows system
 installed, I recommend checking out the following guides:
 - [The EFI system partition created by Windows Setup is too small](https://wiki.archlinux.org/title/Dual_boot_with_Windows#The_EFI_system_partition_created_by_Windows_Setup_is_too_small)
-- [Replace the EFI partition created by Windows Setup with a larger one](https://wiki.archlinux.org/title/EFI_system_partition#Replace_the_partition_with_a_larger_one)
+- [Replace the EFI system partition created by Windows Setup with a larger one](https://wiki.archlinux.org/title/EFI_system_partition#Replace_the_partition_with_a_larger_one)
+- [Restoring an accidentally deleted EFI system partition](https://wiki.archlinux.org/title/Dual_boot_with_Windows#Restoring_an_accidentally_deleted_EFI_system_partition)
 
-**Note:** I do not recommend replacing the EFI partition created by Windows Setup
-with a larger one. This action is risky and could result in your Windows system
-becoming non-bootable.
+If you decide to replace the EFI system partition with a larger one
+post-installation or create one before the installation during the Windows Setup
+step, the recommended size is `1 GiB`.
 
-### Disable Secure Boot
+**Note**: From this point onwards, the **EFI System Partition** may be abbreviated as **ESP**.
+
+Before proceeding with the Arch Linux installation please ensure to follow the
+following steps:
+
+### 1. Disable Secure Boot
 
 Disabling Secure Boot is required to boot into the Arch Linux installation
 medium. Restart your computer and enter BIOS/UEFI settings, then disable Secure
 Boot in the Boot options.
 
-### Disable Fast Startup and Hibernation
+### 2. Disable Fast Startup and Hibernation
 
 Disable these features using PowerShell with administrator privileges:
 ```powershell
-powercfg /H off
+Write-Host "Disabling Hibernation..."
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernateEnabled" -Type Dword -Value 0
+if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings") {
+  Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Name "ShowHibernateOption" -Type Dword -Value 0
+}
 
-
-    Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernteEnabled" -Type Dword -Value 0
-    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Name "ShowHibernateOption" -Type Dword -Value 0
-    if (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization") {
-      Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization" -Name "NoLockScreen" -ErrorAction SilentlyContinue
+Write-Host "Disabling Fast Startup..."
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power' -Name "HiberbootEnabled" -Value 0
 ```
 
-### Shrinking the Disk
+### 3. Time Standard
 
-Launch Disk Management, left click on the volume you would like to shrink e.g.
-(C:) and proceed with shrinking the volume to free up space for Arch Linux.
-
-### Time Standard
-
-It is recommended to configure both Linux and Windows to use UTC. Via PowerShell:
+It is recommended to configure both Linux and Windows to use UTC.
 ```powershell
 New-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\TimeZoneInformation" -Name RealTimeIsUniversal -Value 1 -PropertyType DWord -Force
-```
-or
-```powershell
-reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f
 ```
 
 If Windows prompts to update the clock for Daylight Saving Time (DST) changes,
 allow it. It will adjust the displayed time while keeping the system clock in
 UTC as intended.
 
-### Bluetooth Paring
+### 4. Shrink the Disk
+
+Launch `diskmgmt.msc`, left click on the volume you would like to shrink e.g.
+(C:) and proceed with shrinking the volume to free up space for Arch Linux.
+
+### Tips and Tricks
+
+#### Bluetooth Paring
 
 When pairing Bluetooth devices between Linux and Windows installations, both
 systems share the same MAC address but use different link keys during pairing.
@@ -81,6 +86,8 @@ methods are also described
 [here](https://wiki.archlinux.org/title/Bluetooth#Dual_boot_pairing).
 
 ## Pre-installation
+
+Boot into the Arch Linux installation media.
 
 ### Set the Console Keyboard Layout
 
@@ -105,16 +112,18 @@ Console fonts are located in `/usr/share/kbd/consolefonts`. These fonts are
 commonly included in the live ISO, but they can also be installed with the
 package `terminus-font`.
 
-My preferred fonts:
+My preferred console fonts:
 - `ter-132b` - Suitable for HiDPI screens with large characters
 - `ter-v22b` or `ter-v24b` - Good choices for standard screens
 
 The `n` and `b` suffixes in the font name denote normal and bold variants, respectively.
 
-To set a specific font, use `setfont`.
+To set a specific font, use `setfont`:
 ```zsh
 setfont ter-132b
 ```
+
+**Note**: This
 
 ### Verify the Boot Mode
 
@@ -129,13 +138,13 @@ instructions are intended for systems booting in UEFI mode. While most steps are
 both systems, there are some key distinctions. Please proceed with caution.
 
 Differences:
-- BIOS boot mode does not need an EFI partition unlike UEFI mode.
+- BIOS boot mode does not need an ESP unlike UEFI mode.
 - BIOS is based on MBR while UEFI is based on GPT.
 
 ### Connect to the Internet
 
-If using an Ethernet connection, plug in your Ethernet cable and verify the
-connection. If using Wi-Fi, ensure the wireless card is not blocked using
+If using an Ethernet connection, plug in your Ethernet cable and move on to the
+next step. If using Wi-Fi, ensure the wireless card is not blocked using
 [`rfkill`](https://wiki.archlinux.org/title/Network_configuration/Wireless#Rfkill_caveat):
 ```zsh
 # list devices
@@ -172,29 +181,51 @@ timedatectl set-ntp true
 
 The following partitions are **required** for a chosen device:
 - One partition for the root directory `/`.
-- For in UEFI mode: an EFI system partition.
+- For UEFI mode: an EFI system partition.
 
 **Note:**
 - **If you installed Windows before Arch Linux, the disk from which you want to
-  boot already has an EFI system partition, do not create another one, but use
-  the existing partition instead.**
+  boot already has an ESP, do not create another one, but use the existing
+  partition instead.**
 
-#### Layout 
-UEFI with GPT
+#### Partition Layout 
+
+<p style="text-align: center;">UEFI with GPT</p>
 
 Mount Point | Partition      | Type                  | Size
 :-:         | :-:            | :-:                   | :-:
-`/boot`     | `/dev/nvmen0p1`| EFI System            | 1 GiB
-`/`         | `/dev/nvmen0p2`| Linux x86-64 Root (/) | Remainder
+`/efi`     | `/dev/nvmen0p1`| EFI System            | 1 GiB
+`/`         | `/dev/nvmen0p4`| Linux x86-64 Root (/) | Remainder
+
+**Note:** The partition devices are based on my machine. Please replace the
+`/dev/nvmen0p1` and `/dev/nvmen0p4` based on your machine.
 
 Use a partitioning tool like fdisk to modify partition tables. For example: 
 
-Create the subvolumes.
+#### Partition the disk
+
+**Note:** `/boot` is not required to be kept in a separate partition.
+
+#### Format the partitions
+
 ```zsh
-mkfs.btrfs /dev/sda2
-mount /dev/sda2 /mnt
+mkfs.btrfs /dev/nvmen0p4
 ```
 
+#### Mount the file systems
+
+For UEFI systems, mount the EFI System Partition:
+
+```zsh
+mount --mkdir /dev/nvmen0p1 /mnt/efi
+```
+
+**Note:** The EFI System Partition (ESP) can be mounted either at `/boot` or
+`/efi`. However, for an encrypted `/boot`, it is
+[required](https://wiki.archlinux.org/title/EFI_system_partition#Typical_mount_points)
+to mount the ESP to `/efi`, as EFI-related files must remain unencrypted.
+
+#### BTRFS
 Create the subvolumes:
 ```zsh
 btrfs subvolume create /mnt/@root
@@ -218,13 +249,25 @@ UUID=<uuid_of_sda2>  /home           btrfs   subvol=@home,defaults,noatime,space
 UUID=<uuid_of_sda2>  /.snapshots     btrfs   subvol=@snapshots,defaults,noatime,space_cache,autodefrag   0 0
 ```
 
-### GRUB Bootloader
+### Bootloader
 
-GRUB 2 does **not** required for [encrypted
-`/boot`](https://wiki.archlinux.org/title/GRUB#Encrypted_/boot) to be in
-a seperate partition.
+The bootloader must meet the following requirements:
+- Support for [Btrfs](https://wiki.archlinux.org/title/GRUB#Supported_file_systems)
+- Support for [detecting other operating systems](https://wiki.archlinux.org/title/GRUB#Detecting_other_operating_systems)
+- Support for [booting with a LUKS-encrypted `/boot`](https://wiki.archlinux.org/title/GRUB#Encrypted_boot)
+
+One popular bootloader that meets all these requirements is GRUB.
+
+GRUB will be used to manage the encrypted `/boot`. GRUB has
+a [feature](https://wiki.archlinux.org/title/GRUB#Encrypted_boot) that allows it
+to unlock a LUKS-encrypted `/boot`.
+
 To enable this feature encrypt the partition with /boot residing on it using
-LUKS as normal. Then add the following option to /etc/default/grub: 
+LUKS as normal. Then add the following option to `/etc/default/grub`: 
+```zsh
+
+```
+
 
 ### TPM2 Unlocking
 
