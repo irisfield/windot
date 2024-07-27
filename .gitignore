@@ -1,2 +1,5 @@
 # Ignore specific files in directories
 lf/files
+
+# Ignore directories and everything inside them
+WindowsPowerShell/Modules
