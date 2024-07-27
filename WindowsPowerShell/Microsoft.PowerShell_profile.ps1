@@ -1,4 +1,3 @@
-
 # Environment Variables
 # $env:PATH += "${env:USERPROFILE}\Documents\PowerShell\Bin\file-windows"
 
@@ -6,6 +5,7 @@ $env:GIT_CONFIG_GLOBAL = "${env:LOCALAPPDATA}\git\config"
 
 if (!(Test-Path -Path $env:GIT_CONFIG_GLOBAL)) {
   New-Item -Path $env:GIT_CONFIG_GLOBAL -ItemType File -Force | Out-Null
+  Invoke-Expression "git config --global core.pager '""'"
   Invoke-Expression "git config --global core.editor nvim"
   Invoke-Expression "git config --global core.autocrlf false"
   Invoke-Expression "git config --global credential.helper manager"
@@ -30,3 +30,7 @@ Set-PSReadLineKeyHandler -Chord Ctrl+o -ScriptBlock {
   [Microsoft.PowerShell.PSConsoleReadLine]::Insert('lf')
   [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
 }
+
+# Posh Git
+Import-Module posh-git
+$GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $True
