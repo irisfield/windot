@@ -469,7 +469,8 @@ foreach ($PackageId in $WinGetPackageIds) {
   Write-Host "Installing ${PackageId}..." -ForegroundColor Yellow
   winget install --id $PackageId
 }
-
+Write-Host "Installating posh-git for Git integration and tab completion..." -ForegroundColor Yellow
+PowerShellGet\Install-Module posh-git -Scope CurrentUser -Force
 
 $WinUtilDownloadPath = "${env:HOMEPATH}\Downloads\winutil.ps1"
 $WinUtilDownloadUrl = "https://github.com/ChrisTitusTech/winutil/releases/latest/download/winutil.ps1"
