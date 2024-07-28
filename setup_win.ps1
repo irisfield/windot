@@ -116,7 +116,7 @@ if (!(Test-Path -Path "${FileExtractPath}\file.exe")) {
 Write-Host "`nConfiguring Symbolic Links..." -ForegroundColor Yellow
 Create-Symlink -Path "${env:LOCALAPPDATA}\lf" -Target "${PSScriptRoot}\lf"
 Create-Symlink -Path "${env:LOCALAPPDATA}\nvim" -Target "${PSScriptRoot}\nvim"
-# Create-Symlink -Path "${env:LOCALAPPDATA}\mpv" -Target "${PSScriptRoot}\mpv"
+Create-Symlink -Path "${env:APPDATA}\mpv" -Target "${PSScriptRoot}\mpv"
 Create-Symlink -Path "${env:APPDATA}\alacritty" -Target "${PSScriptRoot}\alacritty"
 Create-Symlink -Path "${env:HOMEPATH}\Documents\PowerToys" -Target "${PSScriptRoot}\PowerToys"
 Create-Symlink -Path "${env:HOMEPATH}\Documents\WindowsPowerShell" -Target "${PSScriptRoot}\WindowsPowerShell"
