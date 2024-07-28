@@ -454,6 +454,7 @@ $WinGetPackageIds = @(
     "Git.MinGit"
     "7zip.7zip"
     "gokcehan.lf"
+    "9P3JFR0CLLL6" # mpv
     "Neovim.Neovim"
     # "ShareX.ShareX"
     "IDRIX.VeraCrypt"
@@ -467,7 +468,7 @@ $WinGetPackageIds = @(
 Write-Host "--- PACKAGES ---" -ForegroundColor Blue
 foreach ($PackageId in $WinGetPackageIds) {
   Write-Host "Installing ${PackageId}..." -ForegroundColor Yellow
-  winget install --id $PackageId
+  winget install --exact --id $PackageId
 }
 Write-Host "Installating posh-git for Git integration and tab completion..." -ForegroundColor Yellow
 PowerShellGet\Install-Module posh-git -Scope CurrentUser -Force
