@@ -15,7 +15,7 @@ cmd open ${{
     "text/*" { nvim $env:fx }
     "application/json" { nvim $env:fx }
     "inode/x-empty" { nvim $env:fx }
-    "image/*" { &start $env:fx }
+    "image/*" { ImageViewer --random off $env:fx }
     "image/gif" { mpv --no-resume-playback $env:fx }
     "video/*" { mpv --save-position-on-quit $env:fx }
     "video/webm" { mpv --no-resume-playback $env:fx }
