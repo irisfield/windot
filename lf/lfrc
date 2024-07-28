@@ -16,10 +16,10 @@ cmd open ${{
     "application/json" { nvim $env:fx }
     "inode/x-empty" { nvim $env:fx }
     "image/*" { &start $env:fx }
-    "video/*" { &start $env:fx }
-    "image/gif" { &start $env:fx }
-    "video/webm" { &start $env:fx }
-    "application/octet-stream" { &start $env:fx }
+    "image/gif" { mpv --no-resume-playback $env:fx }
+    "video/*" { mpv --save-position-on-quit $env:fx }
+    "video/webm" { mpv --no-resume-playback $env:fx }
+    "application/octet-stream" { mpv --save-position-on-quit $env:fx }
     "audio/*" { &start $env:fx }
     "application/pdf" { &start $env:fx }
     "application/epub" { &start $env:fx }
