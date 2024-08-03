@@ -126,7 +126,7 @@ Write-Host "Symbolic Links Configured!`n" -ForegroundColor Yellow
 
 $Message = "Would you like run the rest of the script and apply settings and preferences?"
 $Choices = "&Yes", "&No"
-$Selection = $Host.UI.PromptForChoice("", $Message, $Choices, -1)
+$Selection = $Host.UI.PromptForChoice("", $Message, $Choices, 1)
 Switch ($Selection) {
   0 { Write-Host ""; break } # Continue running the rest of the script
   1 { exit 1 } # Exit the script
@@ -323,6 +323,11 @@ function Invoke-ApplyRecommendedTweaks {
 
     Write-Host "Disabling Fast Startup..."
     Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power' -Name "HiberbootEnabled" -Value 0
+    Start-Sleep -Seconds 1
+
+    Write-Host "Changing time format to 24-hour format..."
+    Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name "sShortTime" -Value "HH:mm"
+    Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name "sLongTime" -Value "HH:mm:ss"
     Start-Sleep -Seconds 1
 
     Write-Host "Disabling User Account Control (UAC) prompt..."
