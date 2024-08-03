@@ -1,5 +1,7 @@
 # Ignore specific files in directories
 lf/files
+lf/marks
+lf/tags
 
 # Ignore directories and everything inside them
 WindowsPowerShell/Modules
