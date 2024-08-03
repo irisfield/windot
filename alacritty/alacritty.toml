@@ -10,4 +10,4 @@ opacity = 0.9
 dimensions = { columns = 110, lines = 25 }
 
 [font]
-# normal = { family = "JetBrainsMono NF", style = "Regular" }
+normal = { family = "JetBrainsMono NF", style = "Regular" }
