@@ -459,13 +459,12 @@ $WinGetPackageIds = @(
     "Git.MinGit"
     "7zip.7zip"
     "gokcehan.lf"
+    "wez.wezterm"
     "9P3JFR0CLLL6" # mpv
-    "9NNZPQD4WJCK" # Simple Image Viewer
     "Neovim.Neovim"
     # "ShareX.ShareX"
     "IDRIX.VeraCrypt"
     "Mozilla.Firefox"
-    "Alacritty.Alacritty"
     "Microsoft.PowerToys"
     "SumatraPDF.SumatraPDF"
     "rjpcomputing.luaforwindows" # needed for my neovim config
