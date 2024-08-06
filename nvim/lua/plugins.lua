@@ -90,7 +90,6 @@ local plugins = {
   {
     "iamcco/markdown-preview.nvim",
     cmd = {  "MarkdownPreview" }, -- lazy-load on command
-    ft = { "markdown" }, -- lazy-load on filetype
     build = function()
       local download_url = "https://api.github.com/repos/iamcco/markdown-preview.nvim/releases"
       local extract_path = vim.fn.stdpath("data") .. "\\lazy\\markdown-preview.nvim\\app\\bin"
@@ -107,7 +106,7 @@ local plugins = {
       ]]
       local ps_script = string.format(ps_script, download_url, extract_path)
 
-      print "Installing the required binary markdown-preview-win.exe..."
+      print "Installing the markdown-preview.nvim binary..."
       local pipe = io.popen("powershell -command -", "w")
       pipe:write(ps_script)
       pipe:close()
