@@ -478,6 +478,7 @@ $WinGetPackageIds = @(
     "gokcehan.lf"
     "wez.wezterm"
     "9P3JFR0CLLL6" # mpv
+    "yt-dlp.yt-dlp" # mpv dependency
     "Neovim.Neovim"
     # "ShareX.ShareX"
     "IDRIX.VeraCrypt"
