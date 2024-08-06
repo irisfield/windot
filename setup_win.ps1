@@ -83,20 +83,18 @@ function Create-Symlink {
 function Install-FileWindows {
     param(
         [Parameter(Mandatory=$True)]
-        [string]$RepoName,
-        [Parameter(Mandatory=$True)]
-        [string]$ExtractPath
+        [string]$InstallPath
     )
-    $DownloadPath = "${env:TEMP}\${RepoName}.zip"
-    $DownloadApiUrl = "https://api.github.com/repos/nscaife/${RepoName}/releases/latest"
+    $DownloadPath = "${env:TEMP}\file-windows.zip"
+    $DownloadApiUrl = "https://api.github.com/repos/nscaife/file-windows/releases/latest"
 
-    Write-Host "Downloading ${RepoName} to ${env:TEMP}..."
+    Write-Host "Downloading file-windows to ${DownloadPath}..."
     (Invoke-RestMethod $DownloadApiUrl).assets | Select-Object -First 1 |
     ForEach-Object { Invoke-WebRequest $_.browser_download_url -OutFile "$DownloadPath" }
     Start-Sleep -Seconds 1
 
-    Write-Host "Extracting ${RepoName}.zip to ${ExtractPath}..."
-    Expand-Archive -Path "$DownloadPath" -DestinationPath "$ExtractPath" -Force
+    Write-Host "Extracting file-windows.zip to ${InstallPath}..."
+    Expand-Archive -Path "$DownloadPath" -DestinationPath "$InstallPath" -Force
     Start-Sleep -Seconds 1
 
     Write-Host "Cleaning up ${DownloadPath}..."
@@ -104,22 +102,41 @@ function Install-FileWindows {
     Start-Sleep -Seconds 1
 }
 
+function Install-Oculante {
+    param(
+        [Parameter(Mandatory=$True)]
+        [string]$InstallPath
+    )
+    $DownloadApiUrl = "https://api.github.com/repos/woelper/oculante/releases/latest"
+
+    Write-Host "Downloading oculante.exe to ${InstallPath}..."
+    (Invoke-RestMethod $DownloadApiUrl).assets | Where-Object { $_.name -like "*.exe"} |
+    ForEach-Object { Invoke-WebRequest $_.browser_download_url -OutFile "$InstallPath" }
+    Start-Sleep -Seconds 1
+}
+
 # Dependency Check
-$FileRepoName = "file-windows"
-$FileExtractPath = "${env:HOMEPATH}\Documents\PowerShell\Bin\${FileRepoName}"
-if (!(Test-Path -Path "${FileExtractPath}\file.exe")) {
+$BinPath = "${env:HOMEPATH}\Documents\PowerShell\Bin"
+if (!(Test-Path -Path "${BinPath}\file-windows\file.exe")) {
   Write-Host "`nInstallating dependency file-windows..." -ForegroundColor Yellow
-  Install-FileWindows -RepoName $FileRepoName -ExtractPath $FileExtractPath
+  Install-FileWindows -InstallPath "${BinPath}\file-windows"
+}
+
+if (!(Test-Path -Path "${BinPath}\oculante.exe")) {
+  Write-Host "`nInstallating dependency oculante.exe..." -ForegroundColor Yellow
+  Install-Oculante -InstallPath "${BinPath}\oculante.exe"
 }
 
 # Symbolic Links
 Write-Host "`nConfiguring Symbolic Links..." -ForegroundColor Yellow
 Create-Symlink -Path "${env:LOCALAPPDATA}\lf" -Target "${PSScriptRoot}\lf"
 Create-Symlink -Path "${env:LOCALAPPDATA}\nvim" -Target "${PSScriptRoot}\nvim"
+Create-Symlink -Path "${env:LOCALAPPDATA}\oculante" -Target "${PSScriptRoot}\oculante"
 Create-Symlink -Path "${env:APPDATA}\mpv" -Target "${PSScriptRoot}\mpv"
 Create-Symlink -Path "${env:APPDATA}\alacritty" -Target "${PSScriptRoot}\alacritty"
 Create-Symlink -Path "${env:HOMEPATH}\Documents\PowerToys" -Target "${PSScriptRoot}\PowerToys"
 Create-Symlink -Path "${env:HOMEPATH}\Documents\WindowsPowerShell" -Target "${PSScriptRoot}\WindowsPowerShell"
+Create-Symlink -Path "${env:HOMEPATH}\.wezterm.lua" -Target "${PSScriptRoot}\wezterm\wezterm.lua"
 $FirefoxProfile = $(Get-ChildItem "${env:APPDATA}\Mozilla\Firefox\Profiles" | Where-Object { $_.Name -match 'default$' }).FullName
 Create-Symlink -Path "${FirefoxProfile}\user.js" -Target "${PSScriptRoot}\firefox\user.js"
 Write-Host "Symbolic Links Configured!`n" -ForegroundColor Yellow
