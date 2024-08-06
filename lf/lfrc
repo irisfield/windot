@@ -9,20 +9,22 @@ set scrolloff 10
 cmd open ${{
   # The following util is required: https://github.com/nscaife/file-windows
   $fileutil = "${env:USERPROFILE}\Documents\PowerShell\Bin\file-windows\file.exe"
+  $sumatrapdf = "${env:LOCALAPPDATA}\SumatraPDF\SumatraPDF.exe"
   $mimetype = (& $fileutil --mime-type -b $env:fx)
   switch -Wildcard ($mimetype) {
-    "application/*" { &start $env:fx }
     "text/*" { nvim $env:fx }
-    "application/json" { nvim $env:fx }
     "inode/x-empty" { nvim $env:fx }
-    "image/*" { ImageViewer --random off $env:fx }
-    "image/gif" { mpv --no-resume-playback $env:fx }
+    "application/json" { nvim $env:fx }
+    "image/*" { oculante $env:fx }
     "video/*" { mpv --save-position-on-quit $env:fx }
     "video/webm" { mpv --no-resume-playback $env:fx }
     "application/octet-stream" { mpv --save-position-on-quit $env:fx }
     "audio/*" { &start $env:fx }
-    "application/pdf" { &start $env:fx }
-    "application/epub" { &start $env:fx }
+    "application/*" { &start $env:fx }
+    "application/pdf" { & $sumatrapdf $env:fx }
+    "application/x-cbr" { & $sumatrapdf $env:fx }
+    "application/epub+zip" { & $sumatrapdf $env:fx }
+    "application/x-mobipocket-ebook" { & $sumatrapdf $env:fx }
     default { &start $env:fx }
   }
 }}
