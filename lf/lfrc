@@ -8,8 +8,8 @@ set scrolloff 10
 # the programs used to open different file types must be in your $env:PATH
 cmd open ${{
   # The following util is required: https://github.com/nscaife/file-windows
-  $fileutil = "${env:USERPROFILE}\Documents\PowerShell\Bin\file-windows\file.exe"
   $sumatrapdf = "${env:LOCALAPPDATA}\SumatraPDF\SumatraPDF.exe"
+  $fileutil = "${env:USERPROFILE}\Documents\PowerShell\Bin\file-windows\file.exe"
   $mimetype = (& $fileutil --mime-type -b $env:fx)
   switch -Wildcard ($mimetype) {
     "text/*" { nvim $env:fx }
