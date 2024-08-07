@@ -3,5 +3,8 @@ lf/files
 lf/marks
 lf/tags
 
+# Adding it here to avoid tracking changes recent file paths
+oculante/config.json
+
 # Ignore directories and everything inside them
 WindowsPowerShell/Modules
