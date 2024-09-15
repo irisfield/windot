@@ -24,11 +24,12 @@ function lf {
 
 function vv {
   # edit your file system with neovim
-  nvim -c "Dirbuf" # requires the dirbuf.nvim plugin
+  nvim -c "Dirbuf"  # requires the dirbuf.nvim plugin
 }
 
 # Aliases
 Set-Alias vi nvim
+Set-Alias py python
 
 # Git integration
 Import-Module posh-git
