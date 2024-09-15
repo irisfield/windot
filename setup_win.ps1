@@ -485,6 +485,7 @@ $WinGetPackageIds = @(
     "Mozilla.Firefox"
     "Microsoft.PowerToys"
     "SumatraPDF.SumatraPDF"
+    "KeePassXCTeam.KeePassXC"
     "rjpcomputing.luaforwindows" # needed for my neovim config
     "DEVCOM.JetBrainsMonoNerdFont"
 )
