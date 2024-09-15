@@ -2,6 +2,7 @@
 lf/files
 lf/marks
 lf/tags
+lf/history
 
 # Ignore directories and everything inside them
 WindowsPowerShell/Modules
