@@ -1,4 +1,5 @@
 # Environment Variables
+$env:PATH += "${env:ProgramFiles}\KeePassXC;"
 $env:PATH += "${env:USERPROFILE}\Documents\PowerShell\Bin;"
 $env:GIT_CONFIG_GLOBAL = "${env:LOCALAPPDATA}\git\config"
 
@@ -10,6 +11,7 @@ if (!(Test-Path -Path $env:GIT_CONFIG_GLOBAL)) {
   Invoke-Expression "git config --global init.defaultBranch 'master'"
   Invoke-Expression "git config --global credential.helper 'manager'"
   Invoke-Expression "git config --global alias.uncommit 'reset HEAD^'"
+  Invoke-Expression "git config --global alias.uncommit-remote 'push origin master --force'"
   Write-Host -NoNewLine "Git config file location set to: "
   Write-Host "$($env:GIT_CONFIG_GLOBAL)" -ForegroundColor Blue
 }
