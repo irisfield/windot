@@ -9,3 +9,12 @@ user_pref("privacy.trackingprotection.emailtracking.enabled", true);
 user_pref("privacy.trackingprotection.socialtracking.enabled", true);
 user_pref("privacy.globalprivacycontrol.enabled", true);
 user_pref("privacy.globalprivacycontrol.was_ever_enabled", true);
+
+/* disable delay when installing new extensions */
+user_pref("security.dialog_enable_delay", 0);
+
+/* enable spell checker in multi-line text boxes & single-line text boxes */
+user_pref("layout.spellcheckDefault", 2);
+
+/* instatly apply preferences without closing options window */
+user_pref("browser.preferences.instantApply", true);
