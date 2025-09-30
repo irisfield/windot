@@ -129,9 +129,9 @@ if (!(Test-Path -Path "${BinPath}\oculante.exe")) {
 
 # Symbolic Links
 Write-Host "`nConfiguring Symbolic Links..." -ForegroundColor Yellow
-Create-Symlink -Path "${env:LOCALAPPDATA}\lf" -Target "${PSScriptRoot}\lf"
 Create-Symlink -Path "${env:LOCALAPPDATA}\nvim" -Target "${PSScriptRoot}\nvim"
 Create-Symlink -Path "${env:LOCALAPPDATA}\oculante" -Target "${PSScriptRoot}\oculante"
+Create-Symlink -Path "${env:APPDATA}\lf" -Target "${PSScriptRoot}\lf"
 Create-Symlink -Path "${env:APPDATA}\mpv" -Target "${PSScriptRoot}\mpv"
 Create-Symlink -Path "${env:APPDATA}\alacritty" -Target "${PSScriptRoot}\alacritty"
 Create-Symlink -Path "${env:HOMEPATH}\Documents\PowerToys" -Target "${PSScriptRoot}\PowerToys"
@@ -480,7 +480,7 @@ $WinGetPackageIds = @(
     "9P3JFR0CLLL6" # mpv
     "yt-dlp.yt-dlp" # mpv dependency
     "Neovim.Neovim"
-    # "ShareX.ShareX"
+    "ShareX.ShareX"
     "IDRIX.VeraCrypt"
     "Mozilla.Firefox"
     "Microsoft.PowerToys"
