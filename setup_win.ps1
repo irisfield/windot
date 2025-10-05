@@ -79,29 +79,6 @@ function Create-Symlink {
     }
 }
 
-# My LF configuration depends on file-windows
-function Install-FileWindows {
-    param(
-        [Parameter(Mandatory=$True)]
-        [string]$InstallPath
-    )
-    $DownloadPath = "${env:TEMP}\file-windows.zip"
-    $DownloadApiUrl = "https://api.github.com/repos/nscaife/file-windows/releases/latest"
-
-    Write-Host "Downloading file-windows to ${DownloadPath}..."
-    (Invoke-RestMethod $DownloadApiUrl).assets | Select-Object -First 1 |
-    ForEach-Object { Invoke-WebRequest $_.browser_download_url -OutFile "$DownloadPath" }
-    Start-Sleep -Seconds 1
-
-    Write-Host "Extracting file-windows.zip to ${InstallPath}..."
-    Expand-Archive -Path "$DownloadPath" -DestinationPath "$InstallPath" -Force
-    Start-Sleep -Seconds 1
-
-    Write-Host "Cleaning up ${DownloadPath}..."
-    Remove-Item -Path "$DownloadPath" -Force
-    Start-Sleep -Seconds 1
-}
-
 function Install-Oculante {
     param(
         [Parameter(Mandatory=$True)]
@@ -116,12 +93,6 @@ function Install-Oculante {
 }
 
 # Dependency Check
-$BinPath = "${env:HOMEPATH}\Documents\PowerShell\Bin"
-if (!(Test-Path -Path "${BinPath}\file-windows\file.exe")) {
-  Write-Host "`nInstallating dependency file-windows..." -ForegroundColor Yellow
-  Install-FileWindows -InstallPath "${BinPath}\file-windows"
-}
-
 if (!(Test-Path -Path "${BinPath}\oculante.exe")) {
   Write-Host "`nInstallating dependency oculante.exe..." -ForegroundColor Yellow
   Install-Oculante -InstallPath "${BinPath}\oculante.exe"
@@ -479,11 +450,13 @@ $WinGetPackageIds = @(
     "wez.wezterm"
     "9P3JFR0CLLL6" # mpv
     "yt-dlp.yt-dlp" # mpv dependency
+    "GnuWin32.File" # dependency for lf to get mimetype
     "Neovim.Neovim"
     "ShareX.ShareX"
     "IDRIX.VeraCrypt"
     "Mozilla.Firefox"
     "Microsoft.PowerToys"
+    "Syncthing.Syncthing"
     "SumatraPDF.SumatraPDF"
     "KeePassXCTeam.KeePassXC"
     "rjpcomputing.luaforwindows" # needed for my neovim config
