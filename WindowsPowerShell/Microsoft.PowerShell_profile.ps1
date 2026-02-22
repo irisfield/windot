@@ -1,6 +1,9 @@
 # Environment Variables
 $env:PATH += "${env:ProgramFiles}\KeePassXC;"
 $env:PATH += "${env:USERPROFILE}\Documents\PowerShell\Bin;"
+$env:PATH += "${env:APPDATA}\npm;"
+$env:PATH += "${env:USERPROFILE}\AppData\Local\Android\Sdk\platform-tools;"
+$env:PATH += "${env:USERPROFILE}\AppData\Local\Android\Sdk\emulator;"
 $env:GIT_CONFIG_GLOBAL = "${env:LOCALAPPDATA}\git\config"
 
 if (!(Test-Path -Path $env:GIT_CONFIG_GLOBAL)) {
@@ -76,6 +79,8 @@ Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $OnViModeChang
 Set-PSReadLineKeyHandler -Key 'y' -Function Copy -ViMode Command
 Set-PSReadLineKeyHandler -Key 'p' -Function Paste -ViMode Command
 
+Set-PSReadlineOption -HistoryNoDuplicates:$True
+
 # Automatically insert matching quote
 Set-PSReadLineKeyHandler -Chord '"',"'" -ScriptBlock {
   param($key, $arg)
@@ -95,3 +100,7 @@ Set-PSReadLineKeyHandler -Chord '"',"'" -ScriptBlock {
   [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($cursor - 1)
   }
 }
+
+
+# Background processes
+Start-Process -FilePath "syncthing.exe" -ArgumentList "--no-browser" -WindowStyle Hidden
