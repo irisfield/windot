@@ -453,10 +453,12 @@ $WinGetPackageIds = @(
     "GnuWin32.File" # dependency for lf to get mimetype
     "Neovim.Neovim"
     "ShareX.ShareX"
+    "PDFgear.PDFgear"
     "IDRIX.VeraCrypt"
     "Mozilla.Firefox"
     "Microsoft.PowerToys"
     "Syncthing.Syncthing"
+    "Google.PlatformTools"  # adb
     "SumatraPDF.SumatraPDF"
     "KeePassXCTeam.KeePassXC"
     "rjpcomputing.luaforwindows" # needed for my neovim config
