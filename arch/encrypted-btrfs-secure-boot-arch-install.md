@@ -4,7 +4,7 @@ These notes document installing Arch Linux with the following features:
 - UEFI System
 - Secure Boot
 - Dual Boot with Windows (Encrypted)
-- Full-Disk Encryption using BTRFS on LUKS1 (until 
+- Full-Disk Encryption using BTRFS on LUKS1
 - Encrypted Boot Partition with GRUB 2
 - Automatic Disk Decryption via TPM2 Unlocking
 - [Unified Kernel Images (UKI)](https://wiki.archlinux.org/title/Unified_kernel_image)
