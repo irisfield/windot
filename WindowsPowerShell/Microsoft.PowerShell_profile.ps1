@@ -32,6 +32,14 @@ function vv {
   nvim -c "Dirbuf"  # requires the dirbuf.nvim plugin
 }
 
+function zip ($path, $destination) {
+    Compress-Archive -Path $path -DestinationPath $destination -Force
+}
+
+function unzip ($path, $destination) {
+    Expand-Archive -Path $path -DestinationPath $destination -Force
+}
+
 # Aliases
 Set-Alias vi nvim
 Set-Alias py python
@@ -102,5 +110,8 @@ Set-PSReadLineKeyHandler -Chord '"',"'" -ScriptBlock {
 }
 
 
-# Background processes
-Start-Process -FilePath "syncthing.exe" -ArgumentList "--no-browser" -WindowStyle Hidden
+# Background processes (only runs when PowerShell is launched)
+# Start-Process -FilePath "syncthing.exe" -ArgumentList "--no-browser" -WindowStyle Hidden
+
+# Background process (add via Task Scheduler) that runs at Logon:
+# powershell.exe -NoProfile -WindowStyle Hidden -Command "Start-Process -FilePath 'syncthing.exe' -ArgumentList '--no-browser' -WindowStyle Hidden"
