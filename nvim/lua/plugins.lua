@@ -24,12 +24,14 @@ local plugins = {
     event = "InsertEnter", -- lazy-load on event
     -- dependencies are always lazy-loaded unless specified otherwise
     dependencies = {
-      "hrsh7th/cmp-nvim-lua",
       "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-nvim-lua",
+      "onsails/lspkind.nvim",
       "FelipeLema/cmp-async-path",
       "hrsh7th/cmp-nvim-lsp-signature-help",
     },
     config = function()
+      local lspkind = require("lspkind")
       local cmp = require("cmp")
       -- needed to ensure super tab works as intended
       local check_backspace = function()
@@ -38,7 +40,7 @@ local plugins = {
       end
       -- setup
       cmp.setup({
-      mapping = {
+        mapping = {
           ["<C-y>"] = cmp.config.disable,
           ["<C-j>"] = cmp.mapping(cmp.mapping.scroll_docs(-1), { "i", "c" }),
           ["<C-k>"] = cmp.mapping(cmp.mapping.scroll_docs(1), { "i", "c" }),
@@ -66,7 +68,14 @@ local plugins = {
           { name = "nvim_lsp" },
           { name = "buffer", keyboard_length = 2 },
           { name = "async_path" },
-          { name = "nvim_lsp_signature_help" }
+          { name = "nvim_lsp_signature_help" },
+          { name = "codeium" },
+        },
+        formatting = {
+          format = lspkind.cmp_format({
+            mode = "symbol",
+            symbol_map = { Codeium = "" },
+          })
         },
         confirm_opts = {
           behavior = cmp.ConfirmBehavior.Replace,
@@ -89,7 +98,8 @@ local plugins = {
 
   {
     "iamcco/markdown-preview.nvim",
-    cmd = {  "MarkdownPreview" }, -- lazy-load on command
+    ft = { "markdown" },
+    cmd = {  "MarkdownPreview", "MarkdownToggle" }, -- lazy-load on command
     build = function()
       local download_url = "https://api.github.com/repos/iamcco/markdown-preview.nvim/releases"
       local extract_path = vim.fn.stdpath("data") .. "\\lazy\\markdown-preview.nvim\\app\\bin"
@@ -97,7 +107,7 @@ local plugins = {
         # Download zip file to download path
         (Invoke-RestMethod "%s").assets | Where-Object { $_.name -like "*win.zip" } |
         Select-Object -First 1 | ForEach-Object {
-          Invoke-WebRequest -Uri $_.browser_download_url -OutFile "${env:TEMP}\mdp-win.zip"
+        Invoke-WebRequest -Uri $_.browser_download_url -OutFile "${env:TEMP}\mdp-win.zip"
         }
 
         # Extract zip file to extract path and clean up
@@ -113,6 +123,26 @@ local plugins = {
       print("markdown-preview-win.exe was installed successfully!")
     end,
   },
+
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    opts = {},
+  },
+
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        markdown = { "prettier" },
+      },
+      format_on_save = {
+        lsp_format = "fallback",
+        timeout_ns = 1000,
+      },
+    },
+  },
+
 }
 
 -- Bootstrap lazy.nvim

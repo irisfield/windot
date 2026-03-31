@@ -67,7 +67,7 @@ vim.opt.shortmess = vim.opt.shortmess
   + "c" -- do not pass ins-completion-menu status messages
 
 vim.opt.iskeyword = vim.opt.iskeyword
-  + "-" -- treat dash-separated words as one word (text object)
+  - "-" -- treat dash-separated words as seperate words (text object)
   - "_" -- treat underscore_seperated words as seperate words (text object)
 
 -- fo-table gets overwritten by ftplugins (:verb set fo)
