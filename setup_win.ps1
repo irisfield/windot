@@ -110,6 +110,8 @@ Create-Symlink -Path "${env:HOMEPATH}\Documents\WindowsPowerShell" -Target "${PS
 Create-Symlink -Path "${env:HOMEPATH}\.wezterm.lua" -Target "${PSScriptRoot}\wezterm\wezterm.lua"
 $FirefoxProfile = $(Get-ChildItem "${env:APPDATA}\Mozilla\Firefox\Profiles" | Where-Object { $_.Name -match 'default$' }).FullName
 Create-Symlink -Path "${FirefoxProfile}\user.js" -Target "${PSScriptRoot}\firefox\user.js"
+Create-Symlink -Path "${env:HOMEPATH}\.claude\statusline.sh" -Target "${PSScriptRoot}\claude\statusline.sh"
+Create-Symlink -Path "${env:HOMEPATH}\.claude\skills" -Target "${PSScriptRoot}\claude\skills"
 Write-Host "Symbolic Links Configured!`n" -ForegroundColor Yellow
 
 $Message = "Would you like run the rest of the script and apply settings and preferences?"
@@ -453,6 +455,7 @@ $WinGetPackageIds = @(
     "GnuWin32.File" # dependency for lf to get mimetype
     "Neovim.Neovim"
     "ShareX.ShareX"
+    "jqlang.jq" # dependency for claude status line
     "PDFgear.PDFgear"
     "IDRIX.VeraCrypt"
     "Mozilla.Firefox"
