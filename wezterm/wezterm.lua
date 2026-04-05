@@ -26,7 +26,8 @@ config.initial_rows = 25
 -- Keybindings
 config.keys = {
   -- map lf
-  { key = 'o', mods = 'CTRL', action = act{SendString='\x15lf\r'}},
+  { key = 'o', mods = 'CTRL', action = act{ SendString = '\x15lf\r' } },
+  { key = 'w', mods = 'CMD', action = act.CloseCurrentTab{ confirm = false } },
 }
 
 -- Return the configuration to wezterm
