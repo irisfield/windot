@@ -11,9 +11,16 @@ set scrolloff 10
 # the programs used to open different file types must be in your $env:PATH
 cmd open ${{
   # The following util is required: https://github.com/nscaife/file-windows
+
   # $sumatrapdf = "${env:LOCALAPPDATA}\SumatraPDF\SumatraPDF.exe"
   $fileutil = "${env:ProgramFiles(x86)}\GnuWin32\bin\file.exe"
-  $mimetype = (& $fileutil --mime-type -b $env:fx)
+
+  # Resolve the real path of $env:fx if it is a symlink
+  $realPath = (Get-Item $env:fx).Target
+  if (-not $realPath) { $realPath = $env:fx }
+
+  $mimetype = (& $fileutil --mime-type -b $realPath)
+
   switch -Wildcard ($mimetype) {
     "text/*" { nvim $env:fx }
     "inode/x-empty" { nvim $env:fx }
